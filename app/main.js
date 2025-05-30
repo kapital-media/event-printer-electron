@@ -11,6 +11,7 @@ const nativeImage = electron.nativeImage;
 const options = { extraHeaders: 'pragma: no-cache\n' };
 const appIcon = nativeImage.createFromPath(config.iconPath);
 const trayIcon = appIcon.resize({ width: 20, height: 20 });
+const { print } = require("nodejs-printer");
 let mainWindow, splashwindow;
 let contextMenu = null;
 let filepath = null;
@@ -119,6 +120,42 @@ app.setName(config.appName);
 app.setAboutPanelOptions({ applicationName: config.appName, applicationVersion: config.appVersion, copyright: config.copyrightInfo, version: config.appVersion, credits: config.author, authors: [config.author], website: config.website, iconPath: config.iconPath });
 crashReporter.start({ productName: config.appName, companyName: config.author, submitURL: config.website, autoSubmit: false });
 forceSingleInstance();
+
+// Function to handle command-line arguments
+function handleCommandLineArgs() {
+    const args = process.argv.slice(2);  // Get arguments passed to Electron app
+    if (args.includes('--print') && args.length > 1) {
+        const filePath = args[args.indexOf('--print') + 1];
+        printPDF(filePath);
+    }
+}
+
+const path = require('path');
+const fs = require('fs');
+
+function printPDF(filePath) {
+	const convertedPath = filePath.replace(/\\/g, '/');
+	if (!fs.existsSync(convertedPath)){
+        console.error(`File does not exist: ${convertedPath}`);
+		return;
+	}
+    if (mainWindow) {
+        const viewerPath = path.join(__dirname, 'pdfviewer', 'web', 'viewer.html');
+        const encodedPath = encodeURIComponent(`file://${convertedPath}`);
+        const fullURL = `file://${viewerPath}?file=${encodedPath}`;
+
+        console.log(`Loading URL: ${fullURL}`);
+        mainWindow.loadURL(fullURL);
+
+        mainWindow.webContents.once('did-finish-load', () => {
+			print(filePath, {orientation: "landscape"});
+		});
+
+    } else {
+        console.error(`mainWindow not ready: ${filePath}`);
+    }
+}
+
 
 app.on('ready', function () {
     showSplashWindow();
@@ -229,6 +266,7 @@ function createMainWindow() {
         mainWindow.show();
         mainWindow.focus();
     });
+    handleCommandLineArgs();  // Handle the CLI arguments
 }
 
 function handleOpenFile() {

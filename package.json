@@ -5,9 +5,12 @@
   "description": "A pdf viewer built with electron",
   "main": "app/main.js",
   "scripts": {
-    "start": "electron .",
+    "start-dev": "electron .",
+    "start": "electron-forge start -- --print \"C:\\Users\\deneme\\Desktop\\event printer\\event-printer-main\\kapital-events-printer\\pdfs\\out-2221186372.pdf\"",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": "https://github.com/praharshjain/Electron-PDF-Viewer",
   "keywords": [
@@ -21,12 +24,18 @@
   "website": "https://praharsh.tech",
   "copyright": "Copyright © 2023 Praharsh Jain",
   "devDependencies": {
-    "electron": "^23.0.0",
-    "electron-builder": "^24.4.0",
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-deb": "^7.8.1",
+    "@electron-forge/maker-rpm": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
+    "@electron-forge/plugin-fuses": "^7.8.1",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^36.0.0",
     "minimist": "^1.2.8",
     "normalize-url": "^8.0.0"
   },
-  "dependencies": {},
   "build": {
     "appId": "com.praharsh.${name}",
     "compression": "maximum",
@@ -47,5 +56,9 @@
       "mimeType": "application/pdf",
       "role": "Viewer"
     }
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "nodejs-printer": "^0.1.3"
   }
 }
