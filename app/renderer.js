@@ -3,17 +3,18 @@
 // All of the Node.js APIs are available in this process.
 const { ipcRenderer } = require("electron");
 
-let defaultPrinter = 0;
+let defaultPrinter = null;
 function handleClick(myRadio) {
-	console.log("Old value: " + defaultPrinter);
-	console.log("New value: " + myRadio.value);
 	defaultPrinter = myRadio.value;
+	ipcRenderer.invoke("setDefaultPrinter,", defaultPrinter).then((result) => {
+		console.log(result);
+	});
 }
 
 ipcRenderer.on(
 	"printers",
-	(event, { printers, defaultPrinter: defaultPrinter_ }) => {
-		defaultPrinter = defaultPrinter_;
+	(_event, { printers, defaultPrinter: defaultPrinter_ }) => {
+		defaultPrinter = defaultPrinter_.deviceId;
 
 		const printersRadio = document.getElementById("printersFieldSet");
 		for (const printer of printers) {

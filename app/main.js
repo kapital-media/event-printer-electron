@@ -8,10 +8,16 @@ const dialog = electron.dialog;
 const crashReporter = electron.crashReporter;
 const BrowserWindow = electron.BrowserWindow;
 const nativeImage = electron.nativeImage;
+const ipcMain = electron.ipcMain;
 const options = { extraHeaders: "pragma: no-cache\n" };
 const appIcon = nativeImage.createFromPath(config.iconPath);
 const trayIcon = appIcon.resize({ width: 20, height: 20 });
-const { print, getPrinters, getDefaultPrinter } = require("nodejs-printer");
+const {
+	print,
+	getPrinters,
+	getDefaultPrinter,
+	setDefaultPrinter,
+} = require("nodejs-printer");
 let mainWindow, splashwindow;
 let contextMenu = null;
 let filepath = null;
@@ -328,6 +334,11 @@ function createMainWindow() {
 			defaultPrinter: await getDefaultPrinter(),
 		});
 	});
+
+	ipcMain.handle(
+		"setDefaultPrinter",
+		async (_event, printerId) => await setDefaultPrinter(printerId)
+	);
 	handleCommandLineArgs(); // Handle the CLI arguments
 }
 
