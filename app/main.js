@@ -208,9 +208,9 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	height = canvas.canvas.height;
 	const dir = "./pdfs";
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-	const fileName = `./pdfs/out-${participant.participantNo}.pdf`;
+	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
 	getPdfFromHtml(htmlContent, fileName, width, height);
-    printPdf(fileName);
+	printPdf(fileName);
 };
 
 socket.on("print", async (data) => {
@@ -375,7 +375,7 @@ function printPdf(filePath) {
 		console.error(`File does not exist: ${convertedPath}`);
 		return;
 	}
-    print(filePath, { orientation: "landscape" });
+	print(filePath, { orientation: "landscape" });
 }
 
 function printPdfAndLoad(filePath) {
