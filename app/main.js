@@ -46,7 +46,7 @@ const socket = io("https://beta-api.kapital.com.tr", {
 // const clientPrinterId = `${Math.floor(100000 + Math.random() * 900000)}`;
 const clientPrinterId = `123456`;
 
-const getPdfFromHtml = (content, path, width, height) =>
+const getPdfFromHtml = async (content, path, width, height) =>
 	html_to_pdf.generatePdf(
 		{ content },
 		{
@@ -55,7 +55,8 @@ const getPdfFromHtml = (content, path, width, height) =>
 			path,
 			printBackground: true,
 			pageRanges: "1-1",
-		}
+		},
+		(err) => console.log("Error while generating PDF", err)
 	);
 
 const defaultTimeZone = "Europe/Istanbul";
@@ -209,9 +210,8 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	const dir = ".\\pdfs";
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
-	getPdfFromHtml(htmlContent, fileName, width, height).then(() =>
-		printPdf(fileName)
-	);
+	await getPdfFromHtml(htmlContent, fileName, width, height);
+	await printPdf(fileName);
 };
 
 socket.on("print", async (data) => {
@@ -370,12 +370,12 @@ function handleCommandLineArgs() {
 	}
 }
 
-function printPdf(filePath) {
+async function printPdf(filePath) {
 	if (!fs.existsSync(filePath)) {
 		console.error(`File does not exist: ${filePath}`);
 		return;
 	}
-	print(filePath, { orientation: "landscape" });
+	await print(filePath, { orientation: "landscape" });
 }
 
 function printPdfAndLoad(filePath) {
