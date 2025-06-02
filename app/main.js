@@ -56,7 +56,7 @@ const getPdfFromHtml = async (content, path, width, height) =>
 			printBackground: true,
 			pageRanges: "1-1",
 		},
-		(err) => console.log("Error while generating PDF", err)
+		(err) => err && console.log("Error while generating PDF", err)
 	);
 
 const defaultTimeZone = "Europe/Istanbul";
