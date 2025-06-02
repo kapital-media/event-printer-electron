@@ -56,8 +56,6 @@
 			}
 
 			.printers {
-				margin-left: auto;
-				margin-right: auto;
 				width: 25%;
 				background: #fff;
 			}
@@ -65,24 +63,47 @@
 				padding: 8px;
 			}
 
-			.flexBox {
+			.flex {
 				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				flex-direction: row;
+			}
+			.justify-align-start {
+				justify-content: start;
+				align-items: start;
+			}
+			.gap-24 {
+				gap: 24px;
+			}
+			.h-100 {
 				height: 100%;
+			}
+			.row {
+				flex-direction: row;
+			}
+			.col {
+				flex-direction: column;
+			}
+			.w-25 {
+				width: 25%;
+			}
+			.scroll {
+				max-height: 100%;
+				overflow-y: auto;
 			}
 		</style>
 	</head>
 
 	<body>
-		<div class="printers">
-			<fieldset id="printersFieldSet">
-				<legend>Select a maintenance drone:</legend>
-			</fieldset>
+		<div class="flex justify-align-start gap-24 h-100 row">
+			<div class="printers">
+				<fieldset id="printersFieldSet">
+					<legend>Select a Printer:</legend>
+				</fieldset>
+			</div>
+			<div class="flex justify-align-start h-100 col scroll w-25">
+				<p>Printing requests:</p>
+				<ul id="participants"></ul>
+			</div>
 		</div>
-		<div id="participants"><p>lol</p></div>
-
 		<script src="./renderer.js"></script>
 	</body>
 </html>

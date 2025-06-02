@@ -6,9 +6,7 @@ const { ipcRenderer } = require("electron");
 let defaultPrinter = null;
 function handleClick(myRadio) {
 	defaultPrinter = myRadio.value;
-	ipcRenderer.invoke("setDefaultPrinter", defaultPrinter).then((result) => {
-		console.log(result);
-	});
+	ipcRenderer.invoke("setDefaultPrinter", defaultPrinter);
 }
 
 ipcRenderer.on(
@@ -30,3 +28,12 @@ ipcRenderer.on(
 		}
 	}
 );
+
+ipcRenderer.on("print", (_event, { participant }) => {
+	const { name, surname, participantNo } = participant;
+
+	const ul = document.getElementById("participants");
+	const li = document.createElement("li");
+	li.innerText = `${name} ${surname} #${participantNo}`;
+	ul.prepend(li);
+});
