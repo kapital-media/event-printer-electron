@@ -370,23 +370,21 @@ function handleCommandLineArgs() {
 }
 
 function printPdf(filePath) {
-	const convertedPath = filePath.replace(/\\/g, "/");
-	if (!fs.existsSync(convertedPath)) {
-		console.error(`File does not exist: ${convertedPath}`);
+	if (!fs.existsSync(filePath)) {
+		console.error(`File does not exist: ${filePath}`);
 		return;
 	}
 	print(filePath, { orientation: "landscape" });
 }
 
 function printPdfAndLoad(filePath) {
-	const convertedPath = filePath.replace(/\\/g, "/");
-	if (!fs.existsSync(convertedPath)) {
-		console.error(`File does not exist: ${convertedPath}`);
+	if (!fs.existsSync(filePath)) {
+		console.error(`File does not exist: ${filePath}`);
 		return;
 	}
 	if (mainWindow) {
 		const viewerPath = path.join(__dirname, "pdfviewer", "web", "viewer.html");
-		const encodedPath = encodeURIComponent(`file://${convertedPath}`);
+		const encodedPath = encodeURIComponent(`file://${filePath}`);
 		const fullURL = `file://${viewerPath}?file=${encodedPath}`;
 
 		console.log(`Loading URL: ${fullURL}`);
