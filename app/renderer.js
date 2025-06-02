@@ -3,23 +3,29 @@
 // All of the Node.js APIs are available in this process.
 const { ipcRenderer } = require("electron");
 
-ipcRenderer.on("test-file-path", (event, testFilePath) => {
-	const elem = document.createElement("p");
-	elem.innerText = testFilePath;
-	document.getElementById("participants").prepend(elem);
-});
+let defaultPrinter = 0;
+function handleClick(myRadio) {
+	console.log("Old value: " + defaultPrinter);
+	console.log("New value: " + myRadio.value);
+	defaultPrinter = myRadio.value;
+}
 
-ipcRenderer.on("printers", (event, { printers, defaultPrinter }) => {
-	console.log(printers, defaultPrinter);
+ipcRenderer.on(
+	"printers",
+	(event, { printers, defaultPrinter: defaultPrinter_ }) => {
+		defaultPrinter = defaultPrinter_;
 
-	const printersRadio = document.getElementById("printersFieldSet");
-	for (const printer of printers) {
-		const div = document.createElement("div");
-		div.innerHTML = `
-					<input type="radio" id="${printer.name}" name="drone" value="${printer.name}" ${
-			defaultPrinter.deviceId === printer.deviceId ? "checked" : ""
-		} />
+		const printersRadio = document.getElementById("printersFieldSet");
+		for (const printer of printers) {
+			const div = document.createElement("div");
+			div.innerHTML = `
+					<input type="radio" id="${
+						printer.name
+					}" name="drone" onclick="handleClick(this);" value="${
+				printer.name
+			}" ${defaultPrinter.deviceId === printer.deviceId ? "checked" : ""} />
 					<label for="${printer.name}">${printer.name}</label>`;
-		printersRadio.append(div);
+			printersRadio.append(div);
+		}
 	}
-});
+);
