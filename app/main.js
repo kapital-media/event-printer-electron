@@ -206,7 +206,7 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	});
 	width = canvas.canvas.width;
 	height = canvas.canvas.height;
-	const dir = "./pdfs";
+	const dir = ".\\pdfs";
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
 	getPdfFromHtml(htmlContent, fileName, width, height);
