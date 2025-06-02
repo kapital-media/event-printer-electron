@@ -6,7 +6,7 @@ const { ipcRenderer } = require("electron");
 let defaultPrinter = null;
 function handleClick(myRadio) {
 	defaultPrinter = myRadio.value;
-	ipcRenderer.invoke("setDefaultPrinter,", defaultPrinter).then((result) => {
+	ipcRenderer.invoke("setDefaultPrinter", defaultPrinter).then((result) => {
 		console.log(result);
 	});
 }
