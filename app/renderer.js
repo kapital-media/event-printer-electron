@@ -24,7 +24,7 @@ ipcRenderer.on(
 						printer.name
 					}" name="drone" onclick="handleClick(this);" value="${
 				printer.name
-			}" ${defaultPrinter.deviceId === printer.deviceId ? "checked" : ""} />
+			}" ${defaultPrinter === printer.deviceId ? "checked" : ""} />
 					<label for="${printer.name}">${printer.name}</label>`;
 			printersRadio.append(div);
 		}

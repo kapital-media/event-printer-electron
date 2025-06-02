@@ -322,6 +322,10 @@ function createMainWindow() {
 		shell.openExternal(url);
 	});
 	mainWindow.loadURL("file://" + __dirname + "/default.html", options);
+	ipcMain.handle(
+		"setDefaultPrinter",
+		async (_event, printerId) => await setDefaultPrinter(printerId)
+	);
 	mainWindow.once("ready-to-show", async () => {
 		hideSplashWindow();
 		mainWindow.maximize();
@@ -334,11 +338,6 @@ function createMainWindow() {
 			defaultPrinter: await getDefaultPrinter(),
 		});
 	});
-
-	ipcMain.handle(
-		"setDefaultPrinter",
-		async (_event, printerId) => await setDefaultPrinter(printerId)
-	);
 	handleCommandLineArgs(); // Handle the CLI arguments
 }
 
