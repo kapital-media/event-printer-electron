@@ -46,7 +46,7 @@ const socket = io("https://beta-api.kapital.com.tr", {
 // const clientPrinterId = `${Math.floor(100000 + Math.random() * 900000)}`;
 const clientPrinterId = `123456`;
 
-const getPdfFromHtml = async (content, path, width, height) =>
+const getPdfFromHtml = (content, path, width, height) =>
 	html_to_pdf.generatePdf(
 		{ content },
 		{
@@ -209,8 +209,9 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	const dir = ".\\pdfs";
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
-	getPdfFromHtml(htmlContent, fileName, width, height);
-	printPdf(fileName);
+	getPdfFromHtml(htmlContent, fileName, width, height).then(() =>
+		printPdf(fileName)
+	);
 };
 
 socket.on("print", async (data) => {
