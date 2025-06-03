@@ -2,6 +2,11 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 const { ipcRenderer } = require("electron");
+const { app } = require("electron");
+const path = require("path");
+
+const getPdfPath = (filename) =>
+	path.join(app.getAppPath(), "pdfs", `${filename}.pdf`);
 
 let defaultPrinter = null;
 function handleClick(myRadio) {
@@ -11,7 +16,7 @@ function handleClick(myRadio) {
 function handleParticipantClick(myRadio) {
 	const participantNo = myRadio.value;
 	const iframe = document.getElementById("pdfIframe");
-	iframe.src = `./pdfs/out-${participantNo}.pdf`;
+	iframe.src = getPdfPath(`out-${participantNo}`);
 }
 function resetPid() {
 	ipcRenderer.invoke("resetPrinterId");
@@ -65,5 +70,5 @@ ipcRenderer.on("chromePath", (_event, path) => {
 
 ipcRenderer.on("pdfIframe", (_event, participantNo) => {
 	const iframe = document.getElementById("pdfIframe");
-	iframe.src = `./pdfs/out-${participantNo}.pdf`;
+	iframe.src = getPdfPath(`out-${participantNo}`);
 });
