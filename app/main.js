@@ -98,10 +98,6 @@ socket.on("print", async (data) => {
 //creating menus for menu bar
 const menuBarTemplate = [
 	{
-		label: config.appName,
-		role: "appMenu",
-	},
-	{
 		label: "File",
 		submenu: [
 			{
@@ -377,8 +373,8 @@ function createMainWindow() {
 		shell.openExternal(url);
 	});
 	mainWindow.webContents.on("devtools-opened", function (e) {
-		// e.preventDefault();
-		// this.closeDevTools();
+		e.preventDefault();
+		this.closeDevTools();
 	});
 	mainWindow.webContents.on("will-navigate", function (e, url) {
 		e.preventDefault();
@@ -401,7 +397,6 @@ function createMainWindow() {
 		mainWindow.maximize();
 		mainWindow.show();
 		mainWindow.focus();
-		mainWindow.webContents.openDevTools();
 
 		mainWindow.webContents.send("appPath", app.getAppPath());
 		mainWindow.webContents.send("chromePath", chromePath);
