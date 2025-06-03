@@ -47,3 +47,8 @@ ipcRenderer.on("printerId", (_event, printerId) => {
 	span.innerText = printerId;
 	div.innerHTML = span.innerHTML;
 });
+
+ipcRenderer.on("pdfIframe", (_event, src) => {
+	const iframe = document.getElementById("pdfIframe");
+  iframe.src = src;
+});
