@@ -44,7 +44,7 @@ ipcRenderer.on("print", (_event, participant) => {
 	const div = document.createElement("div");
 	div.innerHTML = `
       <input type="radio" id="${participantNo}" name="participant" onclick="handleParticipantClick(this);" value="${participantNo}" checked />
-      <label for="${participantNo}">${name} ${surname} #${participantNo}</label>`;
+      <label for="${participantNo}">${name} ${surname} #${participantNo}</label><br />`;
 	radio.prepend(div);
 });
 
