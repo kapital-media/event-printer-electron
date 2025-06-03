@@ -49,6 +49,8 @@ ipcRenderer.on("printerId", (_event, printerId) => {
 });
 
 ipcRenderer.on("pdfIframe", (_event, src) => {
+	console.log(src);
+
 	const iframe = document.getElementById("pdfIframe");
-  iframe.src = src;
+	iframe.src = `.${src}`;
 });
