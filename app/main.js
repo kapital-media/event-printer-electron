@@ -332,7 +332,7 @@ function createMainWindow() {
 		mainWindow.hide();
 	});
 	mainWindow.on("close", function (event) {
-		if (!application.isQuiting) {
+		if (!app.isQuiting) {
 			event.preventDefault();
 			mainWindow.hide();
 		} else {
