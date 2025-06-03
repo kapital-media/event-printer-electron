@@ -68,7 +68,7 @@ socket.on("print", async (data) => {
 	if (canvas && participant && `${printerId}` === `${clientPrinterId}`) {
 		mainWindow.webContents.send("print", participant);
 		const fileName = await sendToPrinter(canvas, participant, timeInfo);
-		mainWindow.webContents.send("pdfIframe", fileName.replace(/\\/g, "/"));
+		mainWindow.webContents.send("pdfIframe", `.${fileName}`);
 	} else if (`${printerId}` === `${clientPrinterId}`)
 		console.log(
 			"Could not print",
