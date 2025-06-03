@@ -1,8 +1,6 @@
 const electron = require("electron");
 const config = require("./config");
 const { io } = require("socket.io-client");
-const qrcode = require("qrcode");
-const html_to_pdf = require("html-pdf-node");
 const path = require("path");
 const fs = require("fs");
 const app = electron.app;
@@ -18,26 +16,14 @@ const options = { extraHeaders: "pragma: no-cache\n" };
 const appIcon = nativeImage.createFromPath(config.iconPath);
 const trayIcon = appIcon.resize({ width: 20, height: 20 });
 const {
-	print,
 	getPrinters,
 	getDefaultPrinter,
 	setDefaultPrinter,
 } = require("nodejs-printer");
+const { default: sendToPrinter } = require("./utils/printer");
 let mainWindow, splashwindow;
 let contextMenu = null;
 let filepath = null;
-const dayjs = require("dayjs");
-const timezone = require("dayjs/plugin/timezone");
-const localeData = require("dayjs/plugin/localeData");
-const duration = require("dayjs/plugin/duration");
-const utc = require("dayjs/plugin/utc");
-require("dayjs/locale/tr");
-require("dayjs/locale/en");
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(localeData);
-dayjs.extend(duration);
 
 const socket = io("https://beta-api.kapital.com.tr", {
 	autoConnect: true,
@@ -46,173 +32,9 @@ const socket = io("https://beta-api.kapital.com.tr", {
 // const clientPrinterId = `${Math.floor(100000 + Math.random() * 900000)}`;
 const clientPrinterId = `123456`;
 
-const getPdfFromHtml = async (content, path, width, height) =>
-	html_to_pdf.generatePdf(
-		{ content },
-		{
-			width: `${width}mm`,
-			height: `${height}mm`,
-			path,
-			printBackground: true,
-			pageRanges: "1-1",
-		},
-		(err) => err && console.log("Error while generating PDF", err)
-	);
-
-const defaultTimeZone = "Europe/Istanbul";
-const getLocalDateFormat = () => {
-	const now = new Date(2013, 11, 31);
-	let str = now.toLocaleDateString();
-	str = str.replace("31", "DD");
-	str = str.replace("12", "MM");
-	str = str.replace("2013", "YYYY");
-	return str;
-};
-
-const getFormattedDate = (date, dateFormat, timeZone = defaultTimeZone) => {
-	const format = dateFormat ?? getLocalDateFormat() ?? "DD/MM/YYYY";
-
-	return dayjs(date).tz(timeZone).format(format);
-};
-
-const parseDynamicVariable = (questionId, participant) => {
-	const answerValue = participant.answers
-		?.filter((a) => Boolean(a.question))
-		.find((answer) => answer.question.id === questionId)?.value;
-	return answerValue ?? "";
-};
-
-const parseParticipantVariable = async (variable, participant, timeInfo) => {
-	switch (variable) {
-		case "participant.fullName":
-			return `${participant.name} ${participant.surname}`;
-		case "participant.name":
-			return participant.name;
-		case "participant.surname":
-			return participant.surname;
-		case "participant.tagGroup":
-			return participant?.tags?.[0]?.group?.name ?? "";
-		case "participant.dayRestriction":
-			return (
-				participant?.tags
-					?.filter((t) => Boolean(t.activeDate))
-					?.map((t) =>
-						getFormattedDate(
-							t.activeDate,
-							timeInfo?.dateFormat,
-							timeInfo?.timeZone
-						)
-					)
-					?.join(", ") ?? ""
-			);
-		case "participant.QR":
-			return await qrcode.toDataURL(participant.participantNo);
-		default:
-			return parseDynamicVariable(variable, participant);
-	}
-};
-
-const convertToHTML = (value) => {
-	const { items } = value;
-	const html = `
-    <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-    @page {
-          margin: 0mm; /* Set margin on each page */
-        }
-    @media print {
-    
-      p { margin: 0 }
-      * { margin: 0 }
-      html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-        margin: 0;
-        padding: 0;
-        border: 0;
-        font-size: 100%;
-        font: inherit;
-        vertical-align: baseline;
-      }
-    }
-    </style>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap&subset=latin-ext" rel="stylesheet">
-    </head>
-  <body style="overflow: hidden; margin: 0; padding: 0;">
-    <div style="position: relative;">
-      ${items
-				.map((item) => {
-					if (item.isImage) {
-						return `<img 
-            src="${item.text}" 
-            style="
-              position: absolute; 
-              left: ${item.x}px; 
-              top: ${item.y}px; 
-              width: ${item.width}px; 
-              height: ${item.height}px; 
-            " 
-          />`;
-					} else {
-						return `<span 
-            style="
-              position: absolute; 
-              left: ${item.x}px; 
-              top: ${item.y}px; 
-              width: ${item.width}px; 
-              height: ${item.height}px; 
-              font-size: ${item.fontSize}px; 
-              line-height: ${item.lineHeight}px; 
-              font-weight: ${item.fontWeight || "400"}; 
-              font-style: ${item.fontStyle || "normal"};
-              text-decoration: ${item.textDecoration || "none"};
-              text-align: ${item.textAlign || "left"}; 
-              text-transform:  ${item.textTransform || "none"};
-              color:  ${item.color || "#000000"};
-              display: block;
-              font-family: Roboto; 
-            "
-          >
-            ${item.text}
-          </span>`;
-					}
-				})
-				.join("")}
-    </div></body></html>`;
-
-	return html;
-};
-
 socket.on("connect", () => {
 	console.log(`Connected to server. Printer ID: ${clientPrinterId}`);
 });
-
-const sendToPrinter = async (canvas, participant, timeInfo) => {
-	updatedItems = [];
-	for (const item of canvas.items) {
-		updatedtem = { ...item };
-		updatedtem.text = await parseParticipantVariable(
-			item.text,
-			participant,
-			timeInfo
-		);
-		updatedItems.push(updatedtem);
-	}
-
-	htmlContent = convertToHTML({
-		items: updatedItems,
-		canvas: canvas.canvas,
-	});
-	width = canvas.canvas.width;
-	height = canvas.canvas.height;
-	const dir = ".\\pdfs";
-	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
-	await getPdfFromHtml(htmlContent, fileName, width, height);
-	await printPdf(fileName);
-};
 
 socket.on("print", async (data) => {
 	const { canvas, participant, printerId, timeInfo } = data;
@@ -360,44 +182,6 @@ crashReporter.start({
 	autoSubmit: false,
 });
 forceSingleInstance();
-
-// Function to handle command-line arguments
-function handleCommandLineArgs() {
-	const args = process.argv.slice(2); // Get arguments passed to Electron app
-	if (args.includes("--print") && args.length > 1) {
-		const filePath = args[args.indexOf("--print") + 1];
-		printPdfAndLoad(filePath);
-	}
-}
-
-async function printPdf(filePath) {
-	if (!fs.existsSync(filePath)) {
-		console.error(`File does not exist: ${filePath}`);
-		return;
-	}
-	await print(filePath, { orientation: "landscape" });
-}
-
-function printPdfAndLoad(filePath) {
-	if (!fs.existsSync(filePath)) {
-		console.error(`File does not exist: ${filePath}`);
-		return;
-	}
-	if (mainWindow) {
-		const viewerPath = path.join(__dirname, "pdfviewer", "web", "viewer.html");
-		const encodedPath = encodeURIComponent(`file://${filePath}`);
-		const fullURL = `file://${viewerPath}?file=${encodedPath}`;
-
-		console.log(`Loading URL: ${fullURL}`);
-		mainWindow.loadURL(fullURL);
-
-		mainWindow.webContents.once("did-finish-load", () => {
-			print(filePath, { orientation: "landscape" });
-		});
-	} else {
-		console.error(`mainWindow not ready: ${filePath}`);
-	}
-}
 
 app.on("ready", function () {
 	showSplashWindow();
@@ -547,7 +331,6 @@ function createMainWindow() {
 			defaultPrinter: await getDefaultPrinter(),
 		});
 	});
-	handleCommandLineArgs(); // Handle the CLI arguments
 }
 
 function handleOpenFile() {
