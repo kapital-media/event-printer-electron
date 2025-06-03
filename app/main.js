@@ -193,9 +193,15 @@ const contextMenuTemplate = [
 			mainWindow.show();
 		},
 	},
-	{ label: "Minimize", type: "radio", role: "minimize" },
+	{ label: "Minimize", role: "minimize" },
 	{ type: "separator" },
-	{ label: "Exit", type: "radio", role: "quit" },
+	{
+		label: "Exit",
+		click: function () {
+			mainWindow.destroy();
+			app.quit();
+		},
+	},
 ];
 
 const menu = Menu.buildFromTemplate(menuBarTemplate);
