@@ -7,5 +7,5 @@ module.exports = {
     copyrightInfo: data.copyright,
     author: data.author,
     website: data.website,
-    iconPath: path.join(__dirname, 'icon.png'),
+    iconPath: path.join(__dirname, 'trayIcon.png'),
 }
