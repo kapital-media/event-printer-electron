@@ -60,7 +60,7 @@
 	"dependencies": {
 		"dayjs": "^1.11.12",
 		"electron-squirrel-startup": "^1.0.1",
-		"html-pdf-node": "^1.0.8",
+		"html-pdf-node": "git://github.com/3nws/html-pdf-node",
 		"nodejs-printer": "git://github.com/3nws/nodejs-printer",
 		"qrcode": "^1.5.4",
 		"socket.io-client": "^4.8.1"

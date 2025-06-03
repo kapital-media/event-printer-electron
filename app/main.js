@@ -37,9 +37,24 @@ const readSavedPrinterId = () => {
 	}
 };
 
+const readSavedChromePath = () => {
+	try {
+		const id = fs.readFileSync("chromePath.txt", "utf8");
+		return id?.trim();
+	} catch (err) {
+		return null;
+	}
+};
+
 const writePrinterId = (printerId) => {
 	try {
 		fs.writeFileSync("printerId.txt", printerId);
+	} catch (err) {}
+};
+
+const writeChromePath = (path) => {
+	try {
+		fs.writeFileSync("chromePath.txt", path);
 	} catch (err) {}
 };
 
@@ -48,6 +63,7 @@ const generatePrinterId = () =>
 
 const savedPrinterId = readSavedPrinterId();
 let clientPrinterId = savedPrinterId ?? generatePrinterId();
+let chromePath = readSavedChromePath();
 
 const resetPrinterId = (mainWindow) => {
 	clientPrinterId = generatePrinterId();
@@ -67,7 +83,7 @@ socket.on("print", async (data) => {
 	const { canvas, participant, printerId, timeInfo } = data;
 	if (canvas && participant && `${printerId}` === `${clientPrinterId}`) {
 		mainWindow.webContents.send("print", participant);
-		await sendToPrinter(canvas, participant, timeInfo);
+		await sendToPrinter(canvas, participant, timeInfo, chromePath);
 		mainWindow.webContents.send("pdfIframe", participant.participantNo);
 	} else if (`${printerId}` === `${clientPrinterId}`)
 		console.log(
@@ -355,8 +371,8 @@ function createMainWindow() {
 		shell.openExternal(url);
 	});
 	mainWindow.webContents.on("devtools-opened", function (e) {
-		// e.preventDefault();
-		// this.closeDevTools();
+		e.preventDefault();
+		this.closeDevTools();
 	});
 	mainWindow.webContents.on("will-navigate", function (e, url) {
 		e.preventDefault();
@@ -370,13 +386,17 @@ function createMainWindow() {
 	ipcMain.handle("resetPrinterId", async (_event) =>
 		resetPrinterId(mainWindow)
 	);
+	ipcMain.handle("setChromePath", async (_event, path) => {
+		chromePath = path;
+		writeChromePath(path);
+	});
 	mainWindow.once("ready-to-show", async () => {
 		hideSplashWindow();
 		mainWindow.maximize();
 		mainWindow.show();
 		mainWindow.focus();
-		mainWindow.webContents.openDevTools();
 
+		mainWindow.webContents.send("chromePath", chromePath);
 		mainWindow.webContents.send("printerId", clientPrinterId);
 		mainWindow.webContents.send("printers", {
 			printers: await getPrinters(),

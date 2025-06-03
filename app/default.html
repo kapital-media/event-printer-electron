@@ -98,8 +98,18 @@
 	<body>
 		<div style="margin-bottom: 8px" class="flex row gap-8">
 			<b>Printer ID:</b>
-			<div id="printerId">123456</div>
+			<div id="printerId"></div>
 			<button onclick="resetPid();">Reset PID</button>
+		</div>
+		<div style="margin-bottom: 8px" class="flex row gap-8">
+			<label for="chromePath"> <b>Google Chrome Path:</b></label>
+			<input
+				type="text"
+				name="chromePath"
+				id="chromePath"
+				value=""
+				onchange="handleChromePath(this);"
+			/>
 		</div>
 		<div class="flex justify-align-start gap-24 h-100 row">
 			<div class="printers">

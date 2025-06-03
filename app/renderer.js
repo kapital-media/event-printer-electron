@@ -16,6 +16,9 @@ function handleParticipantClick(myRadio) {
 function resetPid() {
 	ipcRenderer.invoke("resetPrinterId");
 }
+function handleChromePath(input) {
+	ipcRenderer.invoke("setChromePath", input.value);
+}
 
 ipcRenderer.on(
 	"printers",
@@ -53,6 +56,11 @@ ipcRenderer.on("printerId", (_event, printerId) => {
 	const span = document.createElement("span");
 	span.innerText = printerId;
 	div.innerHTML = span.innerHTML;
+});
+
+ipcRenderer.on("chromePath", (_event, path) => {
+	const input = document.getElementById("chromePath");
+	input.value = path;
 });
 
 ipcRenderer.on("pdfIframe", (_event, participantNo) => {

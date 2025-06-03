@@ -12,7 +12,7 @@ async function printPdf(filePath) {
 	await printer.print(filePath, { orientation: "landscape" });
 }
 
-const sendToPrinter = async (canvas, participant, timeInfo) => {
+const sendToPrinter = async (canvas, participant, timeInfo, chromePath) => {
 	const updatedItems = [];
 	for (const item of canvas.items) {
 		const updatedtem = { ...item };
@@ -33,7 +33,7 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	const dir = ".\\pdfs";
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
-	await getPdfFromHtml(htmlContent, fileName, width, height);
+	await getPdfFromHtml(htmlContent, fileName, width, height, chromePath);
 	await printPdf(fileName);
 };
 
