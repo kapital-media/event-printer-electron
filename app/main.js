@@ -193,7 +193,6 @@ const contextMenuTemplate = [
 			mainWindow.show();
 		},
 	},
-	{ label: "Minimize", role: "minimize" },
 	{ type: "separator" },
 	{
 		label: "Exit",
@@ -230,6 +229,9 @@ app.on("ready", function () {
 	contextMenu = Menu.buildFromTemplate(contextMenuTemplate);
 	tray.setToolTip(config.appName);
 	tray.setContextMenu(contextMenu);
+	tray.on("double-click", () => {
+		mainWindow.show();
+	});
 	Menu.setApplicationMenu(menu);
 	//for OS-X
 	if (app.dock) {
