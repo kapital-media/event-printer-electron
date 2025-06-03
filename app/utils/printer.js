@@ -35,7 +35,6 @@ const sendToPrinter = async (canvas, participant, timeInfo) => {
 	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
 	await getPdfFromHtml(htmlContent, fileName, width, height);
 	await printPdf(fileName);
-	return fileName;
 };
 
 export default sendToPrinter;

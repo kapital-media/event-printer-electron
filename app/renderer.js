@@ -8,6 +8,11 @@ function handleClick(myRadio) {
 	defaultPrinter = myRadio.value;
 	ipcRenderer.invoke("setDefaultPrinter", defaultPrinter);
 }
+function handleParticipantClick(myRadio) {
+	const participantNo = myRadio.value;
+	const iframe = document.getElementById("pdfIframe");
+	iframe.src = `../pdfs/out-${participantNo}`;
+}
 function resetPid() {
 	ipcRenderer.invoke("resetPrinterId");
 }
@@ -23,7 +28,7 @@ ipcRenderer.on(
 			div.innerHTML = `
 					<input type="radio" id="${
 						printer.name
-					}" name="drone" onclick="handleClick(this);" value="${
+					}" name="printer" onclick="handleClick(this);" value="${
 				printer.name
 			}" ${defaultPrinter === printer.deviceId ? "checked" : ""} />
 					<label for="${printer.name}">${printer.name}</label>`;
@@ -35,10 +40,12 @@ ipcRenderer.on(
 ipcRenderer.on("print", (_event, participant) => {
 	const { name, surname, participantNo } = participant;
 
-	const ul = document.getElementById("participants");
-	const li = document.createElement("li");
-	li.innerText = `${name} ${surname} #${participantNo}`;
-	ul.prepend(li);
+	const radio = document.getElementById("participants");
+	const div = document.createElement("div");
+	div.innerHTML = `
+      <input type="radio" id="${participantNo}" name="participant" onclick="handleParticipantClick(this);" value="${participantNo}" checked />
+      <label for="${participantNo}">${name} ${surname} #${participantNo}</label>`;
+	radio.prepend(div);
 });
 
 ipcRenderer.on("printerId", (_event, printerId) => {
@@ -48,9 +55,7 @@ ipcRenderer.on("printerId", (_event, printerId) => {
 	div.innerHTML = span.innerHTML;
 });
 
-ipcRenderer.on("pdfIframe", (_event, src) => {
-	console.log(src);
-
+ipcRenderer.on("pdfIframe", (_event, participantNo) => {
 	const iframe = document.getElementById("pdfIframe");
-	iframe.src = `.${src}`;
+	iframe.src = `../pdfs/out-${participantNo}`;
 });
