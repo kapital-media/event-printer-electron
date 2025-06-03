@@ -178,7 +178,7 @@ const menuBarTemplate = [
 				label: "Learn More",
 				click: function () {
 					shell.openExternal(
-						"https://github.com/praharshjain/Electron-PDF-Viewer"
+						"https://github.com/kapital-media/event-printer-electron"
 					);
 				},
 			},
