@@ -355,8 +355,8 @@ function createMainWindow() {
 		shell.openExternal(url);
 	});
 	mainWindow.webContents.on("devtools-opened", function (e) {
-		// e.preventDefault();
-		// this.closeDevTools();
+		e.preventDefault();
+		this.closeDevTools();
 	});
 	mainWindow.webContents.on("will-navigate", function (e, url) {
 		e.preventDefault();
@@ -375,7 +375,6 @@ function createMainWindow() {
 		mainWindow.maximize();
 		mainWindow.show();
 		mainWindow.focus();
-		mainWindow.webContents.openDevTools();
 
 		mainWindow.webContents.send("printerId", clientPrinterId);
 		mainWindow.webContents.send("printers", {
