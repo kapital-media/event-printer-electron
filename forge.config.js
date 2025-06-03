@@ -3,10 +3,9 @@ const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 
 module.exports = {
 	packagerConfig: {
-		asar: true,
-		extraResource: [
-			"node_modules/nodejs-printer/dist/SumatraPDF-3.4.6-32.exe"
-		]
+		asar: {
+			unpack: "**/node_modules/nodejs-printer/**/*",
+		},
 	},
 	target: "electron-renderer",
 	rebuildConfig: {},
