@@ -187,6 +187,12 @@ const menuBarTemplate = [
 	},
 ];
 const contextMenuTemplate = [
+	{
+		label: "Show App",
+		click: function () {
+			mainWindow.show();
+		},
+	},
 	{ label: "Minimize", type: "radio", role: "minimize" },
 	{ type: "separator" },
 	{ label: "Exit", type: "radio", role: "quit" },
@@ -321,11 +327,20 @@ function createMainWindow() {
 	mainWindow.setIcon(appIcon);
 	mainWindow.setOverlayIcon(appIcon, config.appName);
 	resetWindow(mainWindow);
-	mainWindow.on("close", function (e) {
-		mainWindow.webContents.clearHistory();
-		mainWindow.webContents.session.clearCache(function () {
-			mainWindow.destroy();
-		});
+	mainWindow.on("minimize", function (event) {
+		event.preventDefault();
+		mainWindow.hide();
+	});
+	mainWindow.on("close", function (event) {
+		if (!application.isQuiting) {
+			event.preventDefault();
+			mainWindow.hide();
+		} else {
+			mainWindow.webContents.clearHistory();
+			mainWindow.webContents.session.clearCache(function () {
+				mainWindow.destroy();
+			});
+		}
 	});
 	mainWindow.on("closed", function () {
 		mainWindow = null;
