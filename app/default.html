@@ -89,10 +89,18 @@
 				max-height: 100%;
 				overflow-y: auto;
 			}
+			.gap-8 {
+				gap: 8px;
+			}
 		</style>
 	</head>
 
 	<body>
+		<div style="margin-bottom: 8px" class="flex row gap-8">
+			<b>Printer ID:</b>
+			<div id="printerId">123456</div>
+			<button onclick="resetPid();">Reset PID</button>
+		</div>
 		<div class="flex justify-align-start gap-24 h-100 row">
 			<div class="printers">
 				<fieldset id="printersFieldSet">

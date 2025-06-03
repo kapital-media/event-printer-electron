@@ -8,6 +8,9 @@ function handleClick(myRadio) {
 	defaultPrinter = myRadio.value;
 	ipcRenderer.invoke("setDefaultPrinter", defaultPrinter);
 }
+function resetPid() {
+	ipcRenderer.invoke("resetPrinterId");
+}
 
 ipcRenderer.on(
 	"printers",
@@ -29,11 +32,18 @@ ipcRenderer.on(
 	}
 );
 
-ipcRenderer.on("print", (_event, { participant }) => {
+ipcRenderer.on("print", (_event, participant) => {
 	const { name, surname, participantNo } = participant;
 
 	const ul = document.getElementById("participants");
 	const li = document.createElement("li");
 	li.innerText = `${name} ${surname} #${participantNo}`;
 	ul.prepend(li);
+});
+
+ipcRenderer.on("printerId", (_event, printerId) => {
+	const div = document.getElementById("printerId");
+	const span = document.createElement("span");
+	span.innerText = printerId;
+	div.innerHTML = span.innerHTML;
 });

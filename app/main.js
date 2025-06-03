@@ -1,7 +1,6 @@
 const electron = require("electron");
 const config = require("./config");
 const { io } = require("socket.io-client");
-const path = require("path");
 const fs = require("fs");
 const app = electron.app;
 const shell = electron.shell;
@@ -29,8 +28,36 @@ const socket = io("https://beta-api.kapital.com.tr", {
 	autoConnect: true,
 });
 
-// const clientPrinterId = `${Math.floor(100000 + Math.random() * 900000)}`;
-const clientPrinterId = `123456`;
+const readSavedPrinterId = () => {
+	try {
+		const id = fs.readFileSync("printerId.txt", "utf8");
+		return id?.trim();
+	} catch (err) {
+		return null;
+	}
+};
+
+const writePrinterId = (printerId) => {
+	try {
+		fs.writeFileSync("printerId.txt", printerId);
+	} catch (err) {}
+};
+
+const generatePrinterId = () =>
+	`${Math.floor(100000 + Math.random() * 900000)}`;
+
+const savedPrinterId = readSavedPrinterId();
+let clientPrinterId = savedPrinterId ?? generatePrinterId();
+
+const resetPrinterId = (mainWindow) => {
+	clientPrinterId = generatePrinterId();
+	writePrinterId(clientPrinterId);
+	mainWindow.webContents.send("printerId", clientPrinterId);
+};
+
+if (!savedPrinterId) {
+	writePrinterId(clientPrinterId);
+}
 
 socket.on("connect", () => {
 	console.log(`Connected to server. Printer ID: ${clientPrinterId}`);
@@ -38,9 +65,10 @@ socket.on("connect", () => {
 
 socket.on("print", async (data) => {
 	const { canvas, participant, printerId, timeInfo } = data;
-	if (canvas && participant && `${printerId}` === `${clientPrinterId}`)
+	if (canvas && participant && `${printerId}` === `${clientPrinterId}`) {
+		mainWindow.webContents.send("print", participant);
 		await sendToPrinter(canvas, participant, timeInfo);
-	else if (`${printerId}` === `${clientPrinterId}`)
+	} else if (`${printerId}` === `${clientPrinterId}`)
 		console.log(
 			"Could not print",
 			"Canvas:",
@@ -319,6 +347,9 @@ function createMainWindow() {
 		"setDefaultPrinter",
 		async (_event, printerId) => await setDefaultPrinter(printerId)
 	);
+	ipcMain.handle("resetPrinterId", async (_event) =>
+		resetPrinterId(mainWindow)
+	);
 	mainWindow.once("ready-to-show", async () => {
 		hideSplashWindow();
 		mainWindow.maximize();
@@ -326,6 +357,7 @@ function createMainWindow() {
 		mainWindow.focus();
 		mainWindow.webContents.openDevTools();
 
+		mainWindow.webContents.send("printerId", clientPrinterId);
 		mainWindow.webContents.send("printers", {
 			printers: await getPrinters(),
 			defaultPrinter: await getDefaultPrinter(),
