@@ -141,7 +141,13 @@ const menuBarTemplate = [
 				},
 			},
 			{ type: "separator" },
-			{ role: "quit" },
+			{
+				label: "Exit",
+				click: function (item, focusedWindow) {
+					mainWindow.destroy();
+					app.quit();
+				},
+			},
 		],
 	},
 	{
