@@ -333,10 +333,6 @@ function createMainWindow() {
 	mainWindow.setIcon(appIcon);
 	mainWindow.setOverlayIcon(appIcon, config.appName);
 	resetWindow(mainWindow);
-	mainWindow.on("minimize", function (event) {
-		event.preventDefault();
-		mainWindow.hide();
-	});
 	mainWindow.on("close", function (event) {
 		if (!app.isQuiting) {
 			event.preventDefault();
