@@ -1,11 +1,12 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-const { ipcRenderer, app } = require("electron");
+const { ipcRenderer } = require("electron");
 const path = require("path");
 
+let appPath = null;
 const getPdfPath = (filename) =>
-	path.join(app.getAppPath(), "pdfs", `${filename}.pdf`);
+	appPath ? path.join(appPath, "pdfs", `${filename}.pdf`) : "";
 
 let defaultPrinter = null;
 function handleClick(myRadio) {
@@ -65,6 +66,10 @@ ipcRenderer.on("printerId", (_event, printerId) => {
 ipcRenderer.on("chromePath", (_event, path) => {
 	const input = document.getElementById("chromePath");
 	input.value = path;
+});
+
+ipcRenderer.on("appPath", (_event, path) => {
+	appPath = path;
 });
 
 ipcRenderer.on("pdfIframe", (_event, participantNo) => {

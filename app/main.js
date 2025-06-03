@@ -403,6 +403,7 @@ function createMainWindow() {
 		mainWindow.focus();
 		mainWindow.webContents.openDevTools();
 
+		mainWindow.webContents.send("appPath", app.getAppPath());
 		mainWindow.webContents.send("chromePath", chromePath);
 		mainWindow.webContents.send("printerId", clientPrinterId);
 		mainWindow.webContents.send("printers", {
