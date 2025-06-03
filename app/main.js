@@ -188,7 +188,7 @@ const menuBarTemplate = [
 ];
 const contextMenuTemplate = [
 	{
-		label: "Show App",
+		label: "Show",
 		click: function () {
 			mainWindow.show();
 		},
