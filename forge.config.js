@@ -4,24 +4,15 @@ const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 module.exports = {
 	packagerConfig: {
 		asar: true,
+		extraResource: [
+			"node_modules/nodejs-printer/dist/SumatraPDF-3.4.6-32.exe"
+		]
 	},
 	target: "electron-renderer",
 	rebuildConfig: {},
 	makers: [
 		{
 			name: "@electron-forge/maker-squirrel",
-			config: {},
-		},
-		{
-			name: "@electron-forge/maker-zip",
-			platforms: ["darwin"],
-		},
-		{
-			name: "@electron-forge/maker-deb",
-			config: {},
-		},
-		{
-			name: "@electron-forge/maker-rpm",
 			config: {},
 		},
 	],

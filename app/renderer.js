@@ -11,7 +11,7 @@ function handleClick(myRadio) {
 function handleParticipantClick(myRadio) {
 	const participantNo = myRadio.value;
 	const iframe = document.getElementById("pdfIframe");
-	iframe.src = `./pdfs/out-${participantNo}.pdf`;
+	iframe.src = `../pdfs/out-${participantNo}.pdf`;
 }
 function resetPid() {
 	ipcRenderer.invoke("resetPrinterId");
@@ -65,5 +65,5 @@ ipcRenderer.on("chromePath", (_event, path) => {
 
 ipcRenderer.on("pdfIframe", (_event, participantNo) => {
 	const iframe = document.getElementById("pdfIframe");
-	iframe.src = `./pdfs/out-${participantNo}.pdf`;
+	iframe.src = `../pdfs/out-${participantNo}.pdf`;
 });
