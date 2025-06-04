@@ -3,7 +3,6 @@ const config = require("./config");
 const { io } = require("socket.io-client");
 const fs = require("fs");
 const path = require("path");
-const registry = require("registry-js");
 const app = electron.app;
 const shell = electron.shell;
 const Menu = electron.Menu;
@@ -38,30 +37,6 @@ const chromePathTxt = path.join(userDataPath, "chromePath.txt");
 if (!fs.existsSync(pdfsDir)) {
 	fs.mkdirSync(pdfsDir);
 }
-
-const getChromePath = () => {
-	try {
-		const chromeRegistryKey =
-			"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe";
-		const chromeInfo = registry.getKey(chromeRegistryKey);
-
-		if (chromeInfo.values && chromeInfo.values.length > 0) {
-			const chromePath = chromeInfo.values.find(
-				(entry) => entry.name === "Path"
-			);
-
-			if (chromePath) {
-				return chromePath.value.includes("chrome.exe")
-					? chromePath
-					: `${chromePath}\\chrome.exe`;
-			}
-		}
-	} catch (error) {
-		console.error("Error retrieving Chrome path from registry:", error.message);
-	}
-
-	return null;
-};
 
 const deletePdfs = () => {
 	try {
@@ -111,8 +86,7 @@ const generatePrinterId = () =>
 
 const savedPrinterId = readSavedPrinterId();
 let clientPrinterId = savedPrinterId ?? generatePrinterId();
-const savedChromePath = readSavedChromePath();
-let chromePath = savedChromePath ? savedChromePath : getChromePath();
+let chromePath = readSavedChromePath();
 
 const resetPrinterId = (mainWindow) => {
 	clientPrinterId = generatePrinterId();
