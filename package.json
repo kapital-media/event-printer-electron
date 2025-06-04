@@ -1,6 +1,6 @@
 {
 	"name": "event-printer-electron",
-	"productName": "Event Printer Electron",
+	"productName": "Kapital Events Printer",
 	"version": "1.0.0",
 	"description": "A pdf viewer and socker printer built with electron",
 	"main": "app/main.js",

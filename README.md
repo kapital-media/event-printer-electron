@@ -1,4 +1,4 @@
-# Event Printer Electron
+# Kapital Events Printer
   
 ## License
 
