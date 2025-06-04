@@ -38,6 +38,19 @@ if (!fs.existsSync(pdfsDir)) {
 	fs.mkdirSync(pdfsDir);
 }
 
+const deletePdfs = () => {
+	try {
+		fs.rmSync(pdfsDir, { recursive: true, force: true });
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const quit = () => {
+	deletePdfs();
+	app.quit();
+};
+
 const readSavedPrinterId = () => {
 	try {
 		const id = fs.readFileSync(printerIdPath, "utf8");
@@ -151,7 +164,7 @@ const menuBarTemplate = [
 				label: "Exit",
 				click: function (item, focusedWindow) {
 					mainWindow.destroy();
-					app.quit();
+					quit();
 				},
 			},
 		],
@@ -226,7 +239,7 @@ const contextMenuTemplate = [
 		label: "Exit",
 		click: function () {
 			mainWindow.destroy();
-			app.quit();
+			quit();
 		},
 	},
 ];
@@ -272,7 +285,7 @@ app.on("ready", function () {
 // Quit when all windows are closed.
 app.on("window-all-closed", function () {
 	if (!isOSX()) {
-		app.quit();
+		quit();
 	}
 });
 
@@ -305,7 +318,7 @@ function isOSX() {
 
 function forceSingleInstance() {
 	if (!app.requestSingleInstanceLock()) {
-		app.quit();
+		quit();
 	} else {
 		app.on("second-instance", (event, commandLine, workingDirectory) => {
 			// Someone tried to run a second instance, we should focus our window.
@@ -376,7 +389,7 @@ function createMainWindow() {
 	});
 	mainWindow.on("closed", function () {
 		mainWindow = null;
-		app.quit();
+		quit();
 	});
 	mainWindow.webContents.on("new-window", function (e, url) {
 		e.preventDefault();
