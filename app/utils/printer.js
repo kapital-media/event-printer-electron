@@ -3,6 +3,7 @@ import convertToHTML from "./convertToHTML.js";
 import getPdfFromHtml from "./generatePdf.js";
 import printer from "nodejs-printer";
 import fs from "fs";
+import path from "path";
 
 async function printPdf(filePath) {
 	if (!fs.existsSync(filePath)) {
@@ -12,7 +13,13 @@ async function printPdf(filePath) {
 	await printer.print(filePath, { orientation: "landscape" });
 }
 
-const sendToPrinter = async (canvas, participant, timeInfo, chromePath) => {
+const sendToPrinter = async (
+	canvas,
+	participant,
+	timeInfo,
+	pdfsDir,
+	chromePath
+) => {
 	const updatedItems = [];
 	for (const item of canvas.items) {
 		const updatedtem = { ...item };
@@ -30,9 +37,7 @@ const sendToPrinter = async (canvas, participant, timeInfo, chromePath) => {
 	});
 	const width = canvas.canvas.width;
 	const height = canvas.canvas.height;
-	const dir = ".\\pdfs";
-	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-	const fileName = `.\\pdfs\\out-${participant.participantNo}.pdf`;
+	const fileName = path.join(pdfsDir, `out-${participant.participantNo}.pdf`);
 	await getPdfFromHtml(htmlContent, fileName, width, height, chromePath);
 	await printPdf(fileName);
 };

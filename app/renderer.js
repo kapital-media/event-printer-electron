@@ -4,9 +4,9 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
 
-let appPath = null;
+let pdfsDir = null;
 const getPdfPath = (filename) =>
-	appPath ? path.join(appPath, "pdfs", `${filename}.pdf`) : "";
+	pdfsDir ? path.join(pdfsDir, `${filename}.pdf`) : "";
 
 let defaultPrinter = null;
 function handleClick(myRadio) {
@@ -69,8 +69,8 @@ ipcRenderer.on("chromePath", (_event, path) => {
 	input.value = path;
 });
 
-ipcRenderer.on("appPath", (_event, path) => {
-	appPath = path;
+ipcRenderer.on("pdfsDir", (_event, dir) => {
+	pdfsDir = dir;
 });
 
 ipcRenderer.on("pdfIframe", (_event, participantNo) => {

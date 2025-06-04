@@ -2,6 +2,7 @@ const electron = require("electron");
 const config = require("./config");
 const { io } = require("socket.io-client");
 const fs = require("fs");
+const path = require("path");
 const app = electron.app;
 const shell = electron.shell;
 const Menu = electron.Menu;
@@ -28,9 +29,18 @@ const socket = io("https://beta-api.kapital.com.tr", {
 	autoConnect: true,
 });
 
+const userDataPath = app.getPath("userData");
+const pdfsDir = path.join(userDataPath, "pdfs");
+const printerIdPath = path.join(userDataPath, "printerId.txt");
+const chromePathTxt = path.join(userDataPath, "chromePath.txt");
+
+if (!fs.existsSync(pdfsDir)) {
+	fs.mkdirSync(pdfsDir);
+}
+
 const readSavedPrinterId = () => {
 	try {
-		const id = fs.readFileSync("printerId.txt", "utf8");
+		const id = fs.readFileSync(printerIdPath, "utf8");
 		return id?.trim();
 	} catch (err) {
 		return null;
@@ -39,7 +49,7 @@ const readSavedPrinterId = () => {
 
 const readSavedChromePath = () => {
 	try {
-		const id = fs.readFileSync("chromePath.txt", "utf8");
+		const id = fs.readFileSync(chromePathTxt, "utf8");
 		return id?.trim();
 	} catch (err) {
 		return null;
@@ -48,13 +58,13 @@ const readSavedChromePath = () => {
 
 const writePrinterId = (printerId) => {
 	try {
-		fs.writeFileSync("printerId.txt", printerId);
+		fs.writeFileSync(printerIdPath, printerId);
 	} catch (err) {}
 };
 
 const writeChromePath = (path) => {
 	try {
-		fs.writeFileSync("chromePath.txt", path);
+		fs.writeFileSync(chromePathTxt, path);
 	} catch (err) {}
 };
 
@@ -83,7 +93,7 @@ socket.on("print", async (data) => {
 	const { canvas, participant, printerId, timeInfo } = data;
 	if (canvas && participant && `${printerId}` === `${clientPrinterId}`) {
 		mainWindow.webContents.send("print", participant);
-		await sendToPrinter(canvas, participant, timeInfo, chromePath);
+		await sendToPrinter(canvas, participant, timeInfo, pdfsDir, chromePath);
 		mainWindow.webContents.send("pdfIframe", participant.participantNo);
 	} else if (`${printerId}` === `${clientPrinterId}`)
 		console.log(
@@ -398,7 +408,7 @@ function createMainWindow() {
 		mainWindow.show();
 		mainWindow.focus();
 
-		mainWindow.webContents.send("appPath", app.getAppPath());
+		mainWindow.webContents.send("pdfsDir", pdfsDir);
 		mainWindow.webContents.send("chromePath", chromePath);
 		mainWindow.webContents.send("printerId", clientPrinterId);
 		mainWindow.webContents.send("printers", {
