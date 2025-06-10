@@ -1,6 +1,7 @@
 const electron = require("electron");
 const config = require("./config");
 const { io } = require("socket.io-client");
+const { Launcher } = require("chrome-launcher");
 const fs = require("fs");
 const path = require("path");
 const app = electron.app;
@@ -34,23 +35,6 @@ const pdfsDir = path.join(userDataPath, "pdfs");
 const printerIdPath = path.join(userDataPath, "printerId.txt");
 const chromePathTxt = path.join(userDataPath, "chromePath.txt");
 
-if (!fs.existsSync(pdfsDir)) {
-	fs.mkdirSync(pdfsDir);
-}
-
-const deletePdfs = () => {
-	try {
-		fs.rmSync(pdfsDir, { recursive: true, force: true });
-	} catch (error) {
-		console.log(error);
-	}
-};
-
-const quit = () => {
-	deletePdfs();
-	app.quit();
-};
-
 const readSavedPrinterId = () => {
 	try {
 		const id = fs.readFileSync(printerIdPath, "utf8");
@@ -81,12 +65,32 @@ const writeChromePath = (path) => {
 	} catch (err) {}
 };
 
+const getChromePath = () =>
+	readSavedChromePath() ?? Launcher.getInstallations()?.[0];
+
+if (!fs.existsSync(pdfsDir)) {
+	fs.mkdirSync(pdfsDir);
+}
+
+const deletePdfs = () => {
+	try {
+		fs.rmSync(pdfsDir, { recursive: true, force: true });
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const quit = () => {
+	deletePdfs();
+	app.quit();
+};
+
 const generatePrinterId = () =>
 	`${Math.floor(100000 + Math.random() * 900000)}`;
 
 const savedPrinterId = readSavedPrinterId();
 let clientPrinterId = savedPrinterId ?? generatePrinterId();
-let chromePath = readSavedChromePath();
+let chromePath = readSavedChromePath() ?? getChromePath();
 
 const resetPrinterId = (mainWindow) => {
 	clientPrinterId = generatePrinterId();
