@@ -89,9 +89,23 @@ const quit = () => {
 const generatePrinterId = () =>
 	`${Math.floor(100000 + Math.random() * 900000)}`;
 
+const isElectron = "electron" in process.versions;
+
+const isUsingAsar =
+	isElectron &&
+	process.mainModule &&
+	process.mainModule.filename.includes("app.asar");
+
+function fixPathForAsarUnpack(path) {
+	return isUsingAsar ? path.replace("app.asar", "app.asar.unpacked") : path;
+}
+
 const savedPrinterId = readSavedPrinterId();
 let clientPrinterId = savedPrinterId ?? generatePrinterId();
-let chromePath = chromium?.path ?? readSavedChromePath() ?? getChromePath();
+let chromePath =
+	fixPathForAsarUnpack(chromium?.path) ??
+	readSavedChromePath() ??
+	getChromePath();
 
 const resetPrinterId = (mainWindow) => {
 	clientPrinterId = generatePrinterId();
