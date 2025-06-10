@@ -2,6 +2,7 @@ const electron = require("electron");
 const config = require("./config");
 const { io } = require("socket.io-client");
 const { Launcher } = require("chrome-launcher");
+const chromium = require("chromium");
 const fs = require("fs");
 const path = require("path");
 const app = electron.app;
@@ -90,7 +91,7 @@ const generatePrinterId = () =>
 
 const savedPrinterId = readSavedPrinterId();
 let clientPrinterId = savedPrinterId ?? generatePrinterId();
-let chromePath = readSavedChromePath() ?? getChromePath();
+let chromePath = chromium?.path ?? readSavedChromePath() ?? getChromePath();
 
 const resetPrinterId = (mainWindow) => {
 	clientPrinterId = generatePrinterId();

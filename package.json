@@ -59,6 +59,7 @@
 	},
 	"dependencies": {
 		"chrome-launcher": "^1.2.0",
+		"chromium": "^3.0.3",
 		"dayjs": "^1.11.12",
 		"electron-squirrel-startup": "^1.0.1",
 		"html-pdf-node": "git://github.com/kapital-media/html-pdf-node",
