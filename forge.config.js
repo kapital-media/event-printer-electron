@@ -5,8 +5,7 @@ module.exports = {
 	packagerConfig: {
 		icon: "app/icon",
 		asar: {
-			unpack: "**/node_modules/nodejs-printer/**/*",
-			unpack: "**/node_modules/chromium/lib/**/*",
+			unpack: "**/node_modules/{nodejs-printer,chromium}/**/*",
 		},
 	},
 	target: "electron-renderer",
