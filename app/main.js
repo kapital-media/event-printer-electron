@@ -23,7 +23,7 @@ const {
 	setDefaultPrinter,
 } = require("nodejs-printer");
 const { default: sendToPrinter } = require("./utils/printer");
-let mainWindow, splashwindow;
+let mainWindow;
 let contextMenu = null;
 let filepath = null;
 
@@ -284,7 +284,6 @@ crashReporter.start({
 forceSingleInstance();
 
 app.on("ready", function () {
-	showSplashWindow();
 	let tray = new Tray(trayIcon);
 	contextMenu = Menu.buildFromTemplate(contextMenuTemplate);
 	tray.setToolTip(config.appName);
@@ -351,29 +350,6 @@ function forceSingleInstance() {
 	}
 }
 
-function showSplashWindow() {
-	splashwindow = new BrowserWindow({
-		accessibleTitle: config.appName,
-		title: config.appName,
-		icon: config.appIcon,
-		width: 400,
-		height: 300,
-		center: true,
-		resizable: false,
-		movable: false,
-		alwaysOnTop: true,
-		skipTaskbar: true,
-		frame: false,
-	});
-	splashwindow.setIcon(appIcon);
-	splashwindow.setOverlayIcon(appIcon, config.appName);
-	splashwindow.loadURL("file://" + __dirname + "/splash.html", options);
-}
-
-function hideSplashWindow() {
-	splashwindow.close();
-	splashwindow = null;
-}
 
 function createMainWindow() {
 	// Create the main window.
@@ -435,7 +411,6 @@ function createMainWindow() {
 		writeChromePath(path);
 	});
 	mainWindow.once("ready-to-show", async () => {
-		hideSplashWindow();
 		mainWindow.maximize();
 		mainWindow.show();
 		mainWindow.focus();
