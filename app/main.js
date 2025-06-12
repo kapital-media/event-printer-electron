@@ -27,7 +27,7 @@ let mainWindow, splashwindow;
 let contextMenu = null;
 let filepath = null;
 
-const socket = io("https://beta-api.kapital.com.tr", {
+const socket = io("https://api.kapital.com.tr", {
 	autoConnect: true,
 });
 
